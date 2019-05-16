@@ -35,35 +35,35 @@ from model.data_utils import minibatches, pad_sequences, get_chunks, create_tag_
 from sklearn.metrics import classification_report, f1_score
 import numpy as np
 import sys
+from seqeval import metrics
 
 
 def classScores(model, test):
-        """Evaluates performance on test set
+    """Evaluates performance on test set
 
-        Args:
-            test: dataset that yields tuple of (sentences, tags)
+    Args:
+        test: dataset that yields tuple of (sentences, tags)
 
-        Returns:
-            metrics: (dict) metrics["f1_<label>"] = 98.4, ...
+    Returns:
+        metrics: (dict) metrics["f1_<label>"] = 98.4, ...
 
-        """
-        preds = []
-        labels = []
-        for words, labs in minibatches(test, model.config.batch_size):
-            labels_pred, sequence_lengths = model.predict_batch(words)
+    """
+    preds = []
+    labels = []
+    for words, labs in minibatches(test, model.config.batch_size):
+        labels_pred, sequence_lengths = model.predict_batch(words)
 
-            for lab, lab_pred, length in zip(labs, labels_pred,
-                                             sequence_lengths):
-                lab_pred = lab_pred[:length]
-                lab = lab[:length]
-                preds.append(lab_pred)
-                labels.append(lab)
+        for lab, lab_pred, length in zip(labs, labels_pred,
+                                         sequence_lengths):
+            lab_pred = lab_pred[:length]
+            lab = lab[:length]
+            preds.append(lab_pred)
+            labels.append(lab)
 
-        return preds, labels
+    return preds, labels
 
 
 def main(dataset, config):
-
     # build model
     model = NERModel(config)
     model.build()
@@ -72,13 +72,34 @@ def main(dataset, config):
     # index to tag dic
     indxToTag = create_tag_dict("./data/tags.txt")
 
+    # predict labels for the given dataset
     preds, labels = classScores(model, dataset)
-    preds = [indxToTag[item] for items in preds for item in items]
-    labels = [indxToTag[item] for items in labels for item in items]
+
+    # convert label indexes to the corresponding strings
+    preds = [[indxToTag[item] for item in l] for l in preds]
+    labels = [[indxToTag[item] for item in l] for l in labels]
+
+    # flat all sentences in one list (necessary to sklearn metrics)
+    preds_flat = [item for items in preds for item in items]
+    labels_flat = [item for items in labels for item in items]
+
+    # compute scores
     model.logger.info("Results on {} set".format(dataset.filename))
-    model.logger.info(classification_report(labels, preds,
-          labels=['JURISPRUDENCIA', 'LOCAL', 'TEMPO',  'PESSOA', 'LEGISLACAO', 'ORGANIZACAO'], digits=4))
-    model.logger.info(f1_score(labels, preds, average='micro', labels=['JURISPRUDENCIA', 'LOCAL', 'TEMPO',  'PESSOA', 'LEGISLACAO', 'ORGANIZACAO']))
+    model.logger.info(classification_report(labels_flat, preds_flat,
+                                            labels=['JURISPRUDENCIA', 'LOCAL', 'TEMPO', 'PESSOA', 'LEGISLACAO',
+                                                    'ORGANIZACAO'], digits=4))
+    model.logger.info(f1_score(labels_flat, preds_flat, average='micro',
+                               labels=['JURISPRUDENCIA', 'LOCAL', 'TEMPO', 'PESSOA', 'LEGISLACAO', 'ORGANIZACAO']))
+
+    # add I- prefix to tags (necessary to seqeval)
+    preds_iob = [["O" if item == "O" else "I-" + item for item in l] for l in preds]
+    labels_iob = [["O" if item == "O" else "I-" + item for item in l] for l in labels]
+
+    model.logger.info("Results by seqeval")
+    model.logger.info("Number of sentences: {}".format(len(preds_iob)))
+    model.logger.info("Number of tokens: {}".format(sum([len(l) for l in preds_iob])))
+    model.logger.info(metrics.classification_report(labels_iob, preds_iob, digits=4))
+
 
 if len(sys.argv) != 2 or sys.argv[1] not in ["train", "test", "dev"]:
     print("Usage: python classScores.py <train or test or dev>")
@@ -97,7 +118,6 @@ elif dataset == "dev":
 else:
     dataset = CoNLLDataset(config.filename_test, config.processing_word,
                            config.processing_tag, config.max_iter)
-
 
 if __name__ == "__main__":
     main(dataset, config)

@@ -59,11 +59,8 @@ class Config():
                 if self.use_pretrained else None)
 
 
-    # current path
-    cwd = os.getcwd()
-
     # general config
-    dir_output = cwd + "/results/prototype_revised/"
+    dir_output = "results/prototype_revised/"
     dir_model  = dir_output + "model.weights/"
     path_log   = dir_output + "log.txt"
 
@@ -72,9 +69,9 @@ class Config():
     dim_char = 50
 
     # glove files
-    filename_glove = cwd + "/data/glove_s300.txt"
+    filename_glove = "data/glove_s300.txt"
     # trimmed embeddings (created from glove_filename with build_data.py)
-    filename_trimmed = cwd + "/data/glove.6B.{}d.trimmed.npz".format(dim_word)
+    filename_trimmed = "data/glove.6B.{}d.trimmed.npz".format(dim_word)
     use_pretrained = True
 
     # dataset
@@ -82,16 +79,16 @@ class Config():
     # filename_test = "data/coNLL/eng/eng.testb.iob"
     # filename_train = "data/coNLL/eng/eng.train.iob"
 
-    filename_dev = cwd + "/data/dev.txt"
-    filename_test = cwd + "/data/test.txt"
-    filename_train = cwd + "/data/train.txt"
+    filename_dev = "data/dev.txt"
+    filename_test = "data/test.txt"
+    filename_train = "data/train.txt"
 
     max_iter = None # if not None, max number of examples in Dataset
 
     # vocab (created from dataset with build_data.py)
-    filename_words = cwd + "/data/words.txt"
-    filename_tags = cwd + "/data/tags.txt"
-    filename_chars = cwd + "/data/chars.txt"
+    filename_words = "data/words.txt"
+    filename_tags = "data/tags.txt"
+    filename_chars = "data/chars.txt"
 
     # training
     train_embeddings = True

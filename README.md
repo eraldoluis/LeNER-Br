@@ -7,7 +7,7 @@
 **I didn't have any participation in the original project.**
 
 This repository was forked from the original code to add per-entity evaluation
-  by means of the great [seqeval](https://github.com/chakki-works/seqeval) lib.
+  by means of the [seqeval](https://github.com/chakki-works/seqeval) lib.
 The original code included only per-token evaluation which is unusual for NER.
 More information can be found in the [original work page](https://cic.unb.br/~teodecampos/LeNER-Br/).
 

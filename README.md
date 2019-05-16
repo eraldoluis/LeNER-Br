@@ -1,8 +1,10 @@
-# LeNER-Br
+# LeNER-Br with per-entity evaluation
 [LeNER-Br: a Dataset for Named Entity Recognition in Brazilian Legal Text](https://cic.unb.br/~teodecampos/LeNER-Br/) 
   is a project developed as a collaboration between two institutions of the [University of Brasília](http://unb.br/):
     [NEXT (Núcleo de P&D para Excelência e Transformação do Setor Público)](http://next.unb.br/)
     and [CiC (Departamento de Ciência da Computação)](http://www.cic.unb.br/).
+
+**I didn't have any participation in the original project.**
 
 This repository was forked from the original code to add per-entity evaluation
   by means of the great [seqeval](https://github.com/chakki-works/seqeval) lib.
